@@ -1,5 +1,3 @@
-// main.rs
-
 use sdl2::event::Event;
 use sdl2::keyboard::{KeyboardState, Keycode};
 use sdl2::pixels::Color;
@@ -8,6 +6,8 @@ use std::thread::sleep;
 use std::time::Duration;
 
 mod utils;
+
+const PI: f64 = 3.1415926; 
 
 const MAP: [u32; 64] = [
     1, 1, 1, 1, 1, 1, 1, 1, //
@@ -35,12 +35,12 @@ fn main() {
 
     let (window_width, window_height) = window.size();
 
-    let tile_size = (window_width / 8);
+    let (tile_size_x, tile_size_y) = ((window_width / 8), (window_height / 8));
 
     let mut renderer = window.into_canvas().accelerated().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut player_rect = Rect::new(100, 100, 15, 15);
+    let mut player_rect = Rect::new((window_width / 2) as i32, (window_height / 2) as i32, 15, 15);
 
     'mainloop: loop {
         for event in event_pump.poll_iter() {
@@ -72,7 +72,7 @@ fn main() {
         renderer.set_draw_color(Color::RGB(110, 110, 110));
         renderer.clear();
 
-        utils::draw_map(&mut renderer, &MAP, tile_size, window_width, window_height);
+        utils::draw_map(&mut renderer, &MAP, tile_size_x, tile_size_y, window_width, window_height);
 
         renderer.set_draw_color(Color::RGB(255, 0, 0));
         renderer.fill_rect(player_rect).unwrap();
