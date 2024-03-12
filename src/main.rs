@@ -92,6 +92,8 @@ fn main() {
 
         renderer.present();
 
+        println!("{}", player_angle);
+
         sleep(Duration::from_millis(33));
     }
 }
