@@ -1,4 +1,3 @@
-use nalgebra::{Point2, Vector2};
 use sdl2::event::Event;
 use sdl2::keyboard::{KeyboardState, Keycode};
 use sdl2::pixels::Color;
@@ -13,14 +12,14 @@ mod utils;
 const PI: f64 = 3.1415926;
 
 const MAP: [u32; 64] = [
-    1, 1, 1, 1, 1, 1, 1, 1, //
-    1, 0, 1, 0, 0, 0, 0, 1, //
-    1, 0, 1, 0, 0, 0, 0, 1, //
-    1, 0, 1, 1, 0, 0, 0, 1, //
-    1, 0, 0, 0, 0, 0, 0, 1, //
-    1, 0, 0, 0, 0, 1, 0, 1, //
-    1, 0, 0, 0, 0, 1, 0, 1, //
-    1, 1, 1, 1, 1, 1, 1, 1, //
+    1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 0, 1, 0, 0, 0, 0, 1, 
+    1, 0, 1, 0, 0, 0, 0, 1,
+    1, 0, 1, 1, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 0, 0, 0, 1, 0, 1, 
+    1, 0, 0, 0, 0, 1, 0, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 
 ];
 
 fn main() {
@@ -43,11 +42,11 @@ fn main() {
     let mut renderer = window.into_canvas().accelerated().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut player_rect = Rect::new((window_width / 2) as i32, (window_height / 2) as i32, 25, 25); // slap playa in the center of the screen
-    let player_movement_speed: i32 = 15; // player movement speed
+    let mut player_rect = Rect::new((window_width / 2) as i32, (window_height / 2) as i32, 25, 25);
+    let player_movement_speed: i32 = 15;
 
-    let mut player_angle: f64 = 0.0; // player angle (in rads)
-    let player_rotation_speed: f64 = 0.1; // player turning speed, in rads/frame
+    let mut player_angle: f64 = 0.0; // starting angle (rads)
+    let player_rotation_speed: f64 = 0.1; // rotation spd (rads/frame)
 
     'mainloop: loop {
         for event in event_pump.poll_iter() {
@@ -60,26 +59,24 @@ fn main() {
                 _ => {}
             }
         }
-
-        // Player movement logic
         let keys_pressed = KeyboardState::new(&event_pump);
 
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::W) { // moves player up
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
             player_rect.y -= player_movement_speed;
         }
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::A) { // moves player left
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
             player_rect.x -= player_movement_speed;
         }
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::S) { // moves player down
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
             player_rect.y += player_movement_speed;
         }
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::D) { // moves player right
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
             player_rect.x += player_movement_speed;
         }
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Left) { // turns player left
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
             player_angle -= player_rotation_speed;
         }
-        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Right) { // turns player right
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
             player_angle += player_rotation_speed;
         }
 
@@ -88,15 +85,7 @@ fn main() {
 
         utils::draw_map(&mut renderer, &MAP, tile_size_x, tile_size_y, window_width, window_height);
 
-        // stupid fucked up math shit (basically calculating the endpoint of the ray)
-        let ray_length = 600; // this is the length of the ray in px
-        let player_center = player_rect.center();
-        let ray_end_x = (player_center.x as f64 + player_angle.cos() * ray_length as f64) as i32;
-        let ray_end_y = (player_center.y as f64 + player_angle.sin() * ray_length as f64) as i32;
-
-        // draws the ray TODO! factor this shit out
-        renderer.set_draw_color(Color::RGB(250, 0, 105));
-        renderer.draw_line(player_center, (ray_end_x, ray_end_y)).unwrap();
+        utils::cast_ray(&mut renderer, &player_rect, player_angle, 600); // Adjust ray length as needed
 
         renderer.set_draw_color(Color::RGB(240, 100, 160));
         renderer.fill_rect(player_rect).unwrap();
