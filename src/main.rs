@@ -97,4 +97,3 @@ fn main() {
         sleep(Duration::from_millis(33));
     }
 }
-
