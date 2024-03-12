@@ -13,8 +13,8 @@ pub fn draw_map(canvas: &mut Canvas<sdl2::video::Window>, map: &[u32; 64], tile_
             let y = row * tile_size_y;
 
             let color = match map[index] {
-                1 => Color::RGB(255, 255, 255), // Wall
-                0 => Color::RGB(0, 0, 0),       // Path
+                1 => Color::RGB(0, 0, 0), // Wall
+                0 => Color::RGB(120, 220, 240),       // Path
                 _ => panic!("Invalid tile value"),
             };
 
