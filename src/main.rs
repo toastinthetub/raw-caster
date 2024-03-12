@@ -38,13 +38,14 @@ fn main() {
         .unwrap();
 
     let mut event_pump = sdl_context.event_pump();
+    
   
     let mut rect_x = 100;
     let mut rect_y = 100;
     let rect_width = 25; 
     let rect_height = 25; 
 
-    let user_keyboard = KeyboardState::new(&event_pump.as_ref().unwrap());
+    let user_keyboard = KeyboardState::new(&event_pump.as_mut().unwrap());
 
     'mainloop: loop {
 
@@ -53,20 +54,29 @@ fn main() {
                 Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'mainloop;
                 },
-                Event::KeyDown { keycode: Some(Keycode::Left), .. } => {
-                    rect_x -= 25; 
-                },
-                Event::KeyDown { keycode: Some(Keycode::Right), .. } => {
-                    rect_x += 25; 
-                },
-                Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
-                    rect_y -= 25; 
-                },
-                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
-                    rect_y += 25; 
-                },
                 _ => {}
             }
+        }
+
+        let keys_pressed = match event_pump.as_ref() {
+            Ok(event_pump) => KeyboardState::new(event_pump),
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                continue 'mainloop;
+            }
+        };
+
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
+            rect_y -= 25;
+        }
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
+            rect_x -= 25;
+        }
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
+            rect_y += 25;
+        }
+        if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
+            rect_x += 25;
         }
         
         draw_map(MAP);

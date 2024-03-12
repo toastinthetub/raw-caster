@@ -14,10 +14,5 @@ pub fn draw_map(MAP: [u32; 64]) {
         if (i + 1) % side_length == 0 {
             print!("\n");
         }
-
-
     }
-
-    println!("rahh!");
-
 }
