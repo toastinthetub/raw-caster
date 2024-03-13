@@ -4,6 +4,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use utils::Player;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -42,11 +43,7 @@ fn main() {
     let mut renderer = window.into_canvas().accelerated().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut player_rect = Rect::new((window_width / 2) as i32, (window_height / 2) as i32, 25, 25);
-    let player_movement_speed: i32 = 15;
-
-    let mut player_angle: f64 = 0.0; // starting angle (rads)
-    let player_rotation_speed: f64 = 0.1; // rotation spd (rads/frame)
+    let mut player = Player::new(&window, &15, &0.0, &0.1);
 
     'mainloop: loop {
         for event in event_pump.poll_iter() {
@@ -62,22 +59,22 @@ fn main() {
         let keys_pressed = KeyboardState::new(&event_pump);
 
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
-            player_rect.y -= player_movement_speed;
+            player.w_key_pressed();
         }
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
-            player_rect.x -= player_movement_speed;
+            player.a_key_pressed()
         }
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
-            player_rect.y += player_movement_speed;
+            player.s_key_pressed();
         }
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
-            player_rect.x += player_movement_speed;
+            player.d_key_pressed();
         }
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
-            player_angle -= player_rotation_speed;
+            player.left_key_pressed();
         }
         if keys_pressed.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
-            player_angle += player_rotation_speed;
+            player.right_key_pressed();
         }
 
         renderer.set_draw_color(Color::RGB(110, 110, 110));
@@ -85,14 +82,14 @@ fn main() {
 
         utils::draw_map(&mut renderer, &MAP, tile_size_x, tile_size_y, window_width, window_height);
 
-        utils::cast_ray(&mut renderer, &player_rect, player_angle, 600); // Adjust ray length as needed
+        utils::cast_ray(&mut renderer, &player.player_rect, player.player_angle, 600); // Adjust ray length as needed
 
         renderer.set_draw_color(Color::RGB(240, 100, 160));
-        renderer.fill_rect(player_rect).unwrap();
+        renderer.fill_rect(player.player_rect).unwrap();
 
         renderer.present();
 
-        println!("{}", player_angle);
+        println!("{}", player.player_angle);
 
         sleep(Duration::from_millis(33));
     }
